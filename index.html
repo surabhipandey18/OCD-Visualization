@@ -7,7 +7,6 @@
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
     :root {
@@ -148,10 +147,8 @@
     <div id="questions"></div>
     <label>Your Name:</label>
     <input type="text" id="userName" required>
-    <label>Your Email (optional):</label>
-    <input type="email" id="userEmail">
+    
     <button type="submit">Submit</button>
-    <button type="button" onclick="downloadPDF()">Download PDF</button>
   </form>
 
   <div id="result"></div>
@@ -228,20 +225,9 @@
     document.getElementById("historyLog").innerHTML = "<b>Recent Scores:</b><br>" + html;
   }
 
-  function downloadPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const name = document.getElementById("userName").value || "Anonymous";
-    const resultText = document.getElementById("result").innerText;
-    doc.text("Y-BOCS Clinical Report", 20, 20);
-    doc.text(`Name: ${name}`, 20, 40);
-    doc.text(resultText, 20, 50);
-    doc.text(`Date: ${new Date().toLocaleString()}`, 20, 60);
-    doc.save(`YBOCS_${name}.pdf`);
-  }
-
   showHistory();
 </script>
 
 </body>
 </html>
+
