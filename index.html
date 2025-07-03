@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Y-BOCS Clinical Assessment</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    :root {
+      --bg-light: #f9fcff;
+      --text-light: #1f2a44;
+      --primary: #1976d2;
+      --accent: #8e24aa;
+      --card: #ffffff;
+
+      --bg-dark: #121212;
+      --text-dark: #f0f0f0;
+      --card-dark: #1e1e1e;
+    }
+
+    [data-theme="light"] {
+      --bg: var(--bg-light);
+      --text: var(--text-light);
+      --card: var(--card);
+    }
+
+    [data-theme="dark"] {
+      --bg: var(--bg-dark);
+      --text: var(--text-dark);
+      --card: var(--card-dark);
+    }
+
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      height: 100vh;
+      background: linear-gradient(to right, rgba(25, 118, 210, 0.85), rgba(142, 36, 170, 0.85)), url('https://images.unsplash.com/photo-1588776814546-ec8f8c1fbd4b?auto=format&fit=crop&w=1650&q=80') center/cover no-repeat;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      padding: 20px;
+    }
+
+    header h1 {
+      font-size: 3em;
+    }
+
+    header p {
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+
+    header button {
+      margin-top: 30px;
+      padding: 10px 20px;
+      background: white;
+      color: var(--primary);
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .section {
+      padding: 40px 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .question {
+      background: var(--card);
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+    }
+
+    .question small {
+      display: block;
+      margin-top: 5px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .history, #result {
+      margin-top: 30px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    input[type="text"], input[type="email"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0 20px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 14px;
+      color: #aaa;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Y-BOCS Self Assessment</h1>
+    <p>A clinically inspired OCD severity checklist — not a diagnosis</p>
+    <button onclick="document.getElementById('form').scrollIntoView({ behavior: 'smooth' })">Start Assessment</button>
+  </div>
+</header>
+
+<section class="section">
+  <h2>About the Y-BOCS Test</h2>
+  <p>This is a self-report version of the Yale–Brown Obsessive Compulsive Scale, designed to help individuals understand their own symptoms of OCD. It is not a clinical diagnosis and should not replace professional mental health care.</p>
+  <p style="margin-top:10px;color:#c00;"><strong>Disclaimer:</strong> This test is for educational purposes only. Please consult a mental health professional for medical advice.</p>
+</section>
+
+<section class="section" id="form">
+  <form id="ybocsForm">
+    <div id="questions"></div>
+    <label>Your Name:</label>
+    <input type="text" id="userName" required>
+    <label>Your Email (optional):</label>
+    <input type="email" id="userEmail">
+    <button type="submit">Submit</button>
+    <button type="button" onclick="downloadPDF()">Download PDF</button>
+  </form>
+
+  <div id="result"></div>
+  <div class="history" id="historyLog"></div>
+</section>
+
+<section class="section">
+  <h2>Need Help?</h2>
+  <p>If you're concerned about your symptoms, we recommend speaking with a licensed mental health professional.</p>
+  <a href="https://www.google.com/search?q=mental+health+professional+near+me" target="_blank">
+    <button>Consult a Doctor</button>
+  </a>
+</section>
+
+<footer>
+  © 2025 Y-BOCS Self Test. For educational use only. Made by Surabhi Pandey.
+</footer>
+
+<script>
+  const questions = [
+    ["Time occupied by obsessive thoughts", "How many hours a day are spent on obsessive thoughts?"],
+    ["Interference due to obsessive thoughts", "How much do obsessions interfere with your daily life?"],
+    ["Distress associated with obsessions", "How uncomfortable do obsessions make you feel?"],
+    ["Resistance against obsessions", "How often do you try to resist obsessive thoughts?"],
+    ["Control over obsessive thoughts", "How much control do you feel you have over them?"],
+    ["Time spent on compulsions", "How much time is spent on rituals or repeated actions?"],
+    ["Interference due to compulsions", "How do compulsions affect your routine?"],
+    ["Distress from compulsions", "How distressing are compulsions when not performed?"],
+    ["Resistance against compulsions", "How often do you try to resist them?"],
+    ["Control over compulsions", "How much control do you have over your compulsive behavior?"]
+  ];
+
+  const container = document.getElementById('questions');
+  questions.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'question';
+    div.innerHTML = `<p><strong>${i+1}. ${q[0]}</strong><small>${q[1]}</small></p>` +
+      [0,1,2,3,4].map(n =>
+        `<label><input type="radio" name="q${i}" value="${n}" required> ${n}</label>`
+      ).join(' ');
+    container.appendChild(div);
+  });
+
+  function getSeverity(score) {
+    if (score <= 7) return "Subclinical";
+    if (score <= 15) return "Mild";
+    if (score <= 23) return "Moderate";
+    if (score <= 31) return "Severe";
+    return "Extreme";
+  }
+
+  document.getElementById("ybocsForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const name = document.getElementById("userName").value;
+    let total = 0;
+    for (let i = 0; i < 10; i++) {
+      const val = document.querySelector(`input[name="q${i}"]:checked`);
+      total += parseInt(val.value);
+    }
+    const severity = getSeverity(total);
+    const resultText = `Hi ${name}, your Y-BOCS Score is ${total} (${severity})`;
+    document.getElementById("result").innerText = resultText;
+    const history = JSON.parse(localStorage.getItem("ybocsHistory") || "[]");
+    history.push({ name, score: total, severity, date: new Date().toLocaleString() });
+    localStorage.setItem("ybocsHistory", JSON.stringify(history));
+    showHistory();
+  });
+
+  function showHistory() {
+    const log = JSON.parse(localStorage.getItem("ybocsHistory") || "[]");
+    const html = log.slice(-5).reverse().map(
+      item => `🕒 ${item.date}: ${item.name} — ${item.score} (${item.severity})`
+    ).join("<br>");
+    document.getElementById("historyLog").innerHTML = "<b>Recent Scores:</b><br>" + html;
+  }
+
+  function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const name = document.getElementById("userName").value || "Anonymous";
+    const resultText = document.getElementById("result").innerText;
+    doc.text("Y-BOCS Clinical Report", 20, 20);
+    doc.text(`Name: ${name}`, 20, 40);
+    doc.text(resultText, 20, 50);
+    doc.text(`Date: ${new Date().toLocaleString()}`, 20, 60);
+    doc.save(`YBOCS_${name}.pdf`);
+  }
+
+  showHistory();
+</script>
+
+</body>
+</html>
